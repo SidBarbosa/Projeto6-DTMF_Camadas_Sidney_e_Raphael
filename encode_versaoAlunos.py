@@ -6,15 +6,6 @@ import sounddevice as sd
 import matplotlib.pyplot as plt
 import sys
 
-#funções caso queriram usar para sair...
-def signal_handler(signal, frame):
-        print('You pressed Ctrl+C!')
-        sys.exit(0)
-
-#converte intensidade em Db, caso queiram ...
-def todB(s):
-    sdB = 10*np.log10(s)
-    return(sdB)
 
 dtmf_frequencies = {
     '1': (697, 1209), '2': (697, 1336), '3': (697, 1477),
@@ -40,15 +31,13 @@ def gerar_sinal_dtmf(tecla, duration=1.0, fs=44100):
     return sinal, t
 
 def plotar_sinal(t, sinal, fs):
-    # Plotando o sinal no domínio do tempo
     plt.figure()
-    plt.plot(t[:1000], sinal[:1000])  # Mostra apenas os primeiros 1000 pontos
+    plt.plot(t[:1000], sinal[:1000]) 
     plt.title('Sinal DTMF no Domínio do Tempo')
     plt.xlabel('Tempo [s]')
     plt.ylabel('Amplitude')
     plt.show()
 
-    # Plotando o sinal no domínio da frequência
     plt.figure()
     plt.magnitude_spectrum(sinal, Fs=fs)
     plt.title('Sinal DTMF no Domínio da Frequência')
@@ -91,8 +80,6 @@ def main():
     sd.wait()
     
     plotar_sinal(t, sinal, fs)
-    # plotFFT(self, signal, fs)
-    # Exibe gráficos
     plt.show()
     
 
