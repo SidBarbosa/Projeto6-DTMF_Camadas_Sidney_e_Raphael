@@ -48,7 +48,7 @@ def main():
 
     # Plotando o sinal de áudio capturado
     plt.figure()
-    plt.plot(t[:1000], audio[:1000])  # Plotando apenas os primeiros 1000 pontos
+    plt.plot(t[1000:], audio[1000:])  
     plt.title("Áudio capturado - Domínio do Tempo")
     plt.xlabel("Tempo [s]")
     plt.ylabel("Amplitude")
@@ -99,17 +99,16 @@ def main():
 
     # Encontrar a tecla pressionada
     for tecla, (f1, f2) in dtmf_frequencies.items():
-        if any(np.isclose(freqs_de_pico, f1, atol=5)) and any(np.isclose(freqs_de_pico, f2, atol=5)):
-            print(f"A tecla pressionada foi: {tecla}")
-            break
+            if any(abs(f - f1) < 5 for f in freqs_de_pico) and any(abs(f - f2) < 5 for f in freqs_de_pico):
+                print(f"Tecla pressionada: {tecla}")
+                break
+        #print o valor tecla!!!
+        #Se acertou, parabens! Voce construiu um sistema DTMF
 
-    #print o valor tecla!!!
-    #Se acertou, parabens! Voce construiu um sistema DTMF
+        #Você pode tentar também identificar a tecla de um telefone real! Basta gravar o som emitido pelo seu celular ao pressionar uma tecla. 
 
-    #Você pode tentar também identificar a tecla de um telefone real! Basta gravar o som emitido pelo seu celular ao pressionar uma tecla. 
-
-      
-    ## Exiba gráficos do fourier do som gravados 
+        
+        ## Exiba gráficos do fourier do som gravados 
     plt.show()
 
 if __name__ == "__main__":
