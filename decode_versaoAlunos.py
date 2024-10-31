@@ -8,6 +8,12 @@ import matplotlib.pyplot as plt
 import time
 
 
+#funcao para transformas intensidade acustica em dB, caso queira usar
+def todB(s):
+    sdB = 10*np.log10(s)
+    return(sdB)
+
+
 def main():
 
     #*****************************instruções********************************
@@ -15,6 +21,15 @@ def main():
     #declare um objeto da classe da sua biblioteca de apoio (cedida)   
     # algo como:
     signal = signalMeu() 
+
+    #Gd = 0.04709z+0.04025/z^2 - 1.538z + 0.625
+    a = 0.04709
+    b = 0.04025
+    d = -1.538
+    e = 0.625
+
+
+
        
     #voce importou a bilioteca sounddevice como, por exemplo, sd. entao
     # os seguintes parametros devem ser setados:
@@ -53,6 +68,7 @@ def main():
     plt.xlabel("Tempo [s]")
     plt.ylabel("Amplitude")
     plt.show() 
+
     
     ## Calcule e plote o Fourier do sinal audio. como saída tem-se a amplitude e as frequências.
     fs = 44100
@@ -73,44 +89,62 @@ def main():
     #Para descobrir a tecla pressionada, você deve encontrar na tabela DTMF frquências que coincidem com as 2 das 5 que você selecionou.
     #Provavelmente, se tudo deu certo, 2 picos serao PRÓXIMOS aos valores da tabela. Os demais serão picos de ruídos.
 
-    # Identificar os picos na Transformada de Fourier
-    indexes = peakutils.indexes(yf, thres=0.15, min_dist=45)
-    freqs_de_pico = xf[indexes]
+    entrada = audio
+    saida = []
+    for i in range(len(entrada)):
+        if i < 2:
+            saida[i] = entrada[i]
+        saida[i] = -d*saida[i-1] - e*saida[i-2] + a*entrada[i-1] + b*entrada[i-2]
+
+    # Plotadn o o Fourier do sinal filtrado
+    xfs, yfs = signal.calcFFT(saida, fs)
+    plt.figure()
+    plt.plot(xfs, yfs)
+    plt.title("Transformada de Fourier do Sinal Filtrado")
+    plt.xlabel("Frequência [Hz]")
+    plt.ylabel("Magnitude")
+    plt.show()
+
+
+
+    # # Identificar os picos na Transformada de Fourier
+    # indexes = peakutils.indexes(yf, thres=0.15, min_dist=45)
+    # freqs_de_pico = xf[indexes]
     
-    #printe os picos encontrados! 
-    if len(indexes) < 5:
-        print(f"Menos de 5 picos identificados ({len(indexes)} picos), ajustando parâmetros.")
-        # Ajusta os parâmetros novamente para detectar mais picos, se necessário
-        indexes = peakutils.indexes(yf, thres=0.05, min_dist=30)
-        freqs_de_pico = xf[indexes]
+    # #printe os picos encontrados! 
+    # if len(indexes) < 5:
+    #     print(f"Menos de 5 picos identificados ({len(indexes)} picos), ajustando parâmetros.")
+    #     # Ajusta os parâmetros novamente para detectar mais picos, se necessário
+    #     indexes = peakutils.indexes(yf, thres=0.05, min_dist=30)
+    #     freqs_de_pico = xf[indexes]
 
-    print("Frequências identificadas nos picos: ", freqs_de_pico)
+    # print("Frequências identificadas nos picos: ", freqs_de_pico)
 
     
-    #encontre na tabela duas frequencias proximas às frequencias de pico encontradas e descubra qual foi a tecla
+    # #encontre na tabela duas frequencias proximas às frequencias de pico encontradas e descubra qual foi a tecla
 
-    # Identificar quais frequências DTMF correspondem aos picos
-    dtmf_frequencies = {
-        '1': (697, 1209), '2': (697, 1336), '3': (697, 1477),
-        '4': (770, 1209), '5': (770, 1336), '6': (770, 1477),
-        '7': (852, 1209), '8': (852, 1336), '9': (852, 1477),
-        '*': (941, 1209), '0': (941, 1336), '#': (941, 1477)
-    }
+    # # Identificar quais frequências DTMF correspondem aos picos
+    # dtmf_frequencies = {
+    #     '1': (697, 1209), '2': (697, 1336), '3': (697, 1477),
+    #     '4': (770, 1209), '5': (770, 1336), '6': (770, 1477),
+    #     '7': (852, 1209), '8': (852, 1336), '9': (852, 1477),
+    #     '*': (941, 1209), '0': (941, 1336), '#': (941, 1477)
+    # }
 
-    # Encontrar a tecla pressionada
-    for tecla, (f1, f2) in dtmf_frequencies.items():
-        if any(np.isclose(freqs_de_pico, f1, atol=5)) and any(np.isclose(freqs_de_pico, f2, atol=5)):
-            print(f"A tecla pressionada foi: {tecla}")
-            break
+    # # Encontrar a tecla pressionada
+    # for tecla, (f1, f2) in dtmf_frequencies.items():
+    #     if any(np.isclose(freqs_de_pico, f1, atol=5)) and any(np.isclose(freqs_de_pico, f2, atol=5)):
+    #         print(f"A tecla pressionada foi: {tecla}")
+    #         break
 
-    #print o valor tecla!!!
-    #Se acertou, parabens! Voce construiu um sistema DTMF
+    # #print o valor tecla!!!
+    # #Se acertou, parabens! Voce construiu um sistema DTMF
 
-    #Você pode tentar também identificar a tecla de um telefone real! Basta gravar o som emitido pelo seu celular ao pressionar uma tecla. 
+    # #Você pode tentar também identificar a tecla de um telefone real! Basta gravar o som emitido pelo seu celular ao pressionar uma tecla. 
 
       
-    ## Exiba gráficos do fourier do som gravados 
-    plt.show()
+    # ## Exiba gráficos do fourier do som gravados 
+    # plt.show()
 
 if __name__ == "__main__":
     main()
