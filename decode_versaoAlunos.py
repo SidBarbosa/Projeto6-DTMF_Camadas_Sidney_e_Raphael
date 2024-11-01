@@ -22,11 +22,12 @@ def main():
     # algo como:
     signal = signalMeu() 
 
-    #Gd = 0.001365z+0.001331/z^2 - 1.925 + 0.9279
+    #Gd = 0.000214z+0.0002111/z^2 - 1.959 + 0.9592 -> Funcao de transferencia discretizada considerando 1000 como wc
     a = 0.000214
     b = 0.0002111
     d = -1.959
     e = 0.9592
+    
 
 
 
@@ -90,29 +91,25 @@ def main():
     #Provavelmente, se tudo deu certo, 2 picos serao PRÓXIMOS aos valores da tabela. Os demais serão picos de ruídos.
 
     entrada = audio
-    saida = [0,0]
-    saida2 = [0]*len(entrada)
-    for k in range(2, len(entrada)):
-        saida2[k] = -d*saida2[k-1] - e*saida2[k-2] + a*entrada[k-1] + b*entrada[k-2]
+    saida = [0]*len(entrada)
+    saida[1] = a*entrada[0]
+
+    for k in range(2,len(entrada)):
+        saida[k] = -d*saida[k-1] - e*saida[k-2] + a*entrada[k-1] + b*entrada[k-2]
 
 
-    for i in range(len(entrada)):
-        if i < 2:
-            saida[i] = entrada[i]
-        else:
-            saida.append(-d*saida[i-1] - e*saida[i-2] + a*entrada[i-1] + b*entrada[i-2])
+    # Plot do Fourier do sinal filtrado
+    xfs, yfs = signal.calcFFT(saida, fs)
 
-    # Plotadn o o Fourier do sinal filtrado
-    xfs, yfs = signal.calcFFT(saida2, fs)
-
-    plt.figure()
-    plt.plot(xfs, yfs)
-    plt.title("Transformada de Fourier do Sinal Filtrado")
-    plt.xlabel("Frequência [Hz]")
-    plt.ylabel("Magnitude")
-    plt.figure()
+    plt.figure(figsize=(10, 10))
+    plt.subplot(2, 1, 1)
     plt.plot(xf, yf)
     plt.title("Transformada de Fourier do Sinal Gravado")
+    plt.xlabel("Frequência [Hz]")
+    plt.ylabel("Magnitude")
+    plt.subplot(2, 1, 2)
+    plt.plot(xfs, yfs)
+    plt.title("Transformada de Fourier do Sinal Filtrado")
     plt.xlabel("Frequência [Hz]")
     plt.ylabel("Magnitude")
     plt.show()
@@ -127,15 +124,15 @@ def main():
     freqs_de_pico_filtrado = xfs[indexes]
     
     # #printe os picos encontrados! 
-    print('Teste', len(indexes))
+    # print('Teste', len(indexes))
     # if len(indexes) < 5:
     #     print(f"Menos de 5 picos identificados ({len(indexes)} picos), ajustando parâmetros.")
     #     # Ajusta os parâmetros novamente para detectar mais picos, se necessário
     #     indexes = peakutils.indexes(yf, thres=0.05, min_dist=30)
     #     freqs_de_pico = xf[indexes]
 
-    print("Frequências identificadas nos picos: ", freqs_de_pico)
-    print("Frequências identificadas nos picos filtrados: ", freqs_de_pico_filtrado)
+    # print("Frequências identificadas nos picos: ", freqs_de_pico)
+    # print("Frequências identificadas nos picos filtrados: ", freqs_de_pico_filtrado)
 
     
     # #encontre na tabela duas frequencias proximas às frequencias de pico encontradas e descubra qual foi a tecla
