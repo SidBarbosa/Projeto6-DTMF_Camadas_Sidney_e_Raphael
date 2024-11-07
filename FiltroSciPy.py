@@ -33,13 +33,18 @@ sp, data = wavfile.read("SIU.wav")
 audio = data[:,0]
 
 audio_filtro3k = butter_lowpass_filter(audio, cutoff, fs, order)
-tempo = np.linspace(0, 4, fs)
+
+tempo = np.arange(0, len(audio_filtro3k)/fs,1/fs)
 
 
-x1,y1 = signal.calcFFT(audio, fs)
+x1,y1 = signal.calcFFT(audio_filtro3k, fs)
 
 
-plt.figure(figsize=(10, 7))
+
+
+
+
+plt.figure(figsize=(10, 10))
 plt.subplot(2, 1, 1)
 plt.plot(tempo, audio_filtro3k)
 plt.title("Sinal Filtrado - Domínio do Tempo")
@@ -54,7 +59,7 @@ plt.plot(x1, y1)
 plt.show()
 
 
-audio_wav = wavfile.write("SIU_filtrado.wav", fs, audio_filtro3k)
+audio_wav = wavfile.write("SIU_filtrado.wav", fs, audio_filtro3k.astype(np.int16))
 
 
 
@@ -63,13 +68,45 @@ audio_wav = wavfile.write("SIU_filtrado.wav", fs, audio_filtro3k)
 carier = np.cos(2*np.pi*14000*tempo)
 
 modulado = audio_filtro3k*carier
+x2,y2 = signal.calcFFT(modulado, fs)
+
+plt.figure(figsize=(10, 10))
+plt.subplot(2, 1, 1)
+plt.plot(tempo, modulado)
+plt.title("Sinal Modulado - Domínio do Tempo")
+plt.xlabel("Tempo [s]")
+plt.ylabel("Sinal")
+plt.grid()
+plt.subplot(2, 1, 2)
+plt.title("Transformada de Fourier do Sinal Modulado")
+plt.xlabel("Frequência [Hz]")
+plt.ylabel("Magnitude")
+plt.plot(x2, y2)
+plt.show()
+
+
+
 
 constante = max(abs(modulado))
 
-normalizado = []
-for i in modulado:
-    normalizado.append(i*constante)
-audio2_wav = wavfile.write("SIU_modulado.wav", fs, normalizado)
+normalizado = modulado*constante
+
+audio2_wav = wavfile.write("SIU_normalizado.wav", fs, normalizado.astype(np.int16))
+
+plt.plot(tempo, normalizado)
+plt.title("Sinal Modulado Normalizado - Domínio do Tempo")
+plt.xlabel("Tempo [s]")
+plt.ylabel("Sinal")
+plt.show()
+
+
+
+
+
+
+
+
+
 
 
 
