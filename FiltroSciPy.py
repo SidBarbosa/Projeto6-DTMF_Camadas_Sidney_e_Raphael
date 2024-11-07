@@ -19,7 +19,7 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
 
 order = 11 #Quanto maior a ordem mais "rapido" acontece a queda da frequencia (relacionada com o comportamento das funcoes de acordo com o crescimento da ordem)
 fs = 44100     #Frequencia do proprio microfone
-cutoff = 1000  #Frequencia que definimos para corte
+cutoff = 3000  #Frequencia que definimos para corte
 
 
 b, a = butter_lowpass(cutoff, fs, order=2)
@@ -33,7 +33,7 @@ w2, h2 = freqz(b2, a2, fs=fs, worN=8000)
 sp, data = wavfile.read("SIU.wav")
 audio = data[:,0]
 
-audio_filtro3k = butter_lowpass_filter(audio, 3000, fs, order)
+audio_filtro3k = butter_lowpass_filter(audio, cutoff, fs, order)
 tempo = np.linspace(0, len(audio_filtro3k), 1/fs)
 plt.plot(tempo, audio_filtro3k)
 plt.show()
