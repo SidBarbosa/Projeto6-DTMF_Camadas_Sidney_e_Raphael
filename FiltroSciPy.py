@@ -15,18 +15,17 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     y = lfilter(b, a, data)
     return y
 
-
+signal = signalMeu() 
 
 order = 11 #Quanto maior a ordem mais "rapido" acontece a queda da frequencia (relacionada com o comportamento das funcoes de acordo com o crescimento da ordem)
 fs = 44100     #Frequencia do proprio microfone
 cutoff = 3000  #Frequencia que definimos para corte
 
 
-b, a = butter_lowpass(cutoff, fs, order=2)
-b2, a2 = butter_lowpass(cutoff, fs, order)
-
+b, a = butter_lowpass(cutoff, fs, order)
 w, h = freqz(b, a, fs=fs, worN=8000)
-w2, h2 = freqz(b2, a2, fs=fs, worN=8000)
+
+
 
 
 
@@ -34,12 +33,30 @@ sp, data = wavfile.read("SIU.wav")
 audio = data[:,0]
 
 audio_filtro3k = butter_lowpass_filter(audio, cutoff, fs, order)
-tempo = np.linspace(0, len(audio_filtro3k), 1/fs)
+tempo = np.linspace(0, 4, fs)
+
+
+x1,y1 = signal.calcFFT(audio, fs)
+
+
+plt.figure(figsize=(10, 7))
+plt.subplot(2, 1, 1)
 plt.plot(tempo, audio_filtro3k)
+plt.title("Sinal Filtrado - Domínio do Tempo")
+plt.xlabel("Tempo [s]")
+plt.ylabel("Sinal")
+plt.grid()
+plt.subplot(2, 1, 2)
+plt.title("Transformada de Fourier do Sinal Filtrado")
+plt.xlabel("Frequência [Hz]")
+plt.ylabel("Magnitude")
+plt.plot(x1, y1)
 plt.show()
 
 
 audio_wav = wavfile.write("SIU_filtrado.wav", fs, audio_filtro3k)
+
+
 
 
 
@@ -48,11 +65,11 @@ carier = np.cos(2*np.pi*14000*tempo)
 modulado = audio_filtro3k*carier
 
 constante = max(abs(modulado))
-modulado_normalizado = modulado*constante
 
-audio2_wav = wavfile.write("SIU_modulado.wav", fs, modulado_normalizado)
-
-
+normalizado = []
+for i in modulado:
+    normalizado.append(i*constante)
+audio2_wav = wavfile.write("SIU_modulado.wav", fs, normalizado)
 
 
 
@@ -77,7 +94,7 @@ audio2_wav = wavfile.write("SIU_modulado.wav", fs, modulado_normalizado)
 
 
 
-# signal = signalMeu() 
+
 # print("Gravacao comecando e 2 segundos")
 # time.sleep(2)
 # print("Gravando...")
