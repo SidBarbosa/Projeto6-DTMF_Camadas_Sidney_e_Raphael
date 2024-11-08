@@ -18,13 +18,17 @@ fs = 44100
 
 sp,audio = wavfile.read("SIU_modulado.wav")
 signal = signalMeu()
+
+
 signal.plotFFT(audio, fs)
+plt.title("Transformada de Fourier do Sinal Modulado")
+plt.show()
 
 order = 11
 tempo = np.arange(0, len(audio)/fs,1/fs)
 carier = np.cos(2*np.pi*14000*tempo)
 
-plt.show()
+
 
 audio_demodulado = audio*carier
 x2,f2 = signal.calcFFT(audio_demodulado, fs)
@@ -48,6 +52,7 @@ audio_filtro3k = butter_lowpass_filter(audio_demodulado, 3000, fs, order)
 Siu_final = wavfile.write("SIU_final.wav", fs, audio_filtro3k.astype(np.int16))
 
 x3,f3 = signal.calcFFT(audio_filtro3k, fs)
+plt.figure(figsize=(9, 6))
 plt.plot(x3, f3)
 plt.title("Transformada de Fourier do Sinal Demodulado Filtrado")
 plt.xlabel("Frequência [Hz]")
