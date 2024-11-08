@@ -6,7 +6,7 @@ import sounddevice as sd
 from suaBibSignal import *
 from scipy.io import wavfile
 
-
+print('foi')
 def butter_lowpass(cutoff, fs, order=5):
     return butter(order, cutoff, fs=fs, btype='low', analog=False)
 
@@ -31,7 +31,7 @@ w, h = freqz(b, a, fs=fs, worN=8000)
 
 sp, data = wavfile.read("SIU.wav")
 audio = data[:,0]
-
+print('foi2')
 audio_filtro3k = butter_lowpass_filter(audio, cutoff, fs, order)
 
 tempo = np.arange(0, len(audio_filtro3k)/fs,1/fs)
@@ -39,6 +39,7 @@ tempo = np.arange(0, len(audio_filtro3k)/fs,1/fs)
 
 x1,y1 = signal.calcFFT(audio_filtro3k, fs)
 
+print('foi3')
 
 
 
@@ -58,7 +59,7 @@ plt.ylabel("Magnitude")
 plt.plot(x1, y1)
 plt.show()
 
-
+print('foi4')
 audio_wav = wavfile.write("SIU_filtrado.wav", fs, audio_filtro3k.astype(np.int16))
 
 
@@ -89,7 +90,9 @@ plt.show()
 
 constante = max(abs(modulado))
 
-normalizado = modulado*constante
+modulado_teste = wavfile.write("SIU_modulado.wav", fs, modulado.astype(np.int16))
+
+normalizado = modulado/constante
 
 audio2_wav = wavfile.write("SIU_normalizado.wav", fs, normalizado.astype(np.int16))
 
